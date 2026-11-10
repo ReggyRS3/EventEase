@@ -20,15 +20,15 @@ public class VenuesController : Controller
     }
 
     // GET: VENUES/Details/5
-    public async Task<IActionResult> Details(int? venueid)
+    public async Task<IActionResult> Details(int? id)
     {
-        if (venueid == null)
+        if (id == null)
         {
             return NotFound();
         }
 
         var venue = await _context.Venues
-            .FirstOrDefaultAsync(m => m.VenueId == venueid);
+            .FirstOrDefaultAsync(m => m.VenueId == id);
         if (venue == null)
         {
             return NotFound();
@@ -60,14 +60,14 @@ public class VenuesController : Controller
     }
 
     // GET: VENUES/Edit/5
-    public async Task<IActionResult> Edit(int? venueid)
+    public async Task<IActionResult> Edit(int? id)
     {
-        if (venueid == null)
+        if (id == null)
         {
             return NotFound();
         }
 
-        var venue = await _context.Venues.FindAsync(venueid);
+        var venue = await _context.Venues.FindAsync(id);
         if (venue == null)
         {
             return NotFound();
@@ -80,9 +80,9 @@ public class VenuesController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? venueid, [Bind("VenueId,VenueName,Location,Capacity,ImageUrl")] Venue venue)
+    public async Task<IActionResult> Edit(int? id, [Bind("VenueId,VenueName,Location,Capacity,ImageUrl")] Venue venue)
     {
-        if (venueid != venue.VenueId)
+        if (id != venue.VenueId)
         {
             return NotFound();
         }
@@ -111,15 +111,15 @@ public class VenuesController : Controller
     }
 
     // GET: VENUES/Delete/5
-    public async Task<IActionResult> Delete(int? venueid)
+    public async Task<IActionResult> Delete(int? id)
     {
-        if (venueid == null)
+        if (id == null)
         {
             return NotFound();
         }
 
         var venue = await _context.Venues
-            .FirstOrDefaultAsync(m => m.VenueId == venueid);
+            .FirstOrDefaultAsync(m => m.VenueId == id);
         if (venue == null)
         {
             return NotFound();
@@ -131,9 +131,9 @@ public class VenuesController : Controller
     // POST: VENUES/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? venueid)
+    public async Task<IActionResult> DeleteConfirmed(int? id)
     {
-        var venue = await _context.Venues.FindAsync(venueid);
+        var venue = await _context.Venues.FindAsync(id);
         if (venue != null)
         {
             _context.Venues.Remove(venue);
@@ -143,8 +143,8 @@ public class VenuesController : Controller
         return RedirectToAction(nameof(Index));
     }
 
-    private bool VenueExists(int? venueid)
+    private bool VenueExists(int? id)
     {
-        return _context.Venues.Any(e => e.VenueId == venueid);
+        return _context.Venues.Any(e => e.VenueId == id);
     }
 }

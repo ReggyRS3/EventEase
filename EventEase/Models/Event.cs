@@ -12,6 +12,7 @@ namespace EventEase.Models
         public DateTime EventDate { get; set; }
 
         public string? Description { get; set; }
+        public string? ImageUrl { get; set; }
 
         public int VenueId { get; set; }
 

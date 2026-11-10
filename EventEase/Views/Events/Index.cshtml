@@ -1,10 +1,10 @@
 @model IEnumerable<EventEase.Models.Event>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Events";
 }
 
-<h1>Index</h1>
+<h1>Events</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -21,9 +21,11 @@
             <th>
                 @Html.DisplayNameFor(model => model.Description)
             </th>
-           
             <th>
-                @Html.DisplayNameFor(model => model.Venue)
+                Venue
+            </th>
+            <th>
+                Image
             </th>
             <th></th>
         </tr>
@@ -32,19 +34,22 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(model => item.EventName)
+                @Html.DisplayFor(modelItem => item.EventName)
             </td>
             <td>
-                @Html.DisplayFor(model => item.EventDate)
+                @Html.DisplayFor(modelItem => item.EventDate)
             </td>
             <td>
-                @Html.DisplayFor(model => item.Description)
+                @Html.DisplayFor(modelItem => item.Description)
             </td>
-            
-              
-           
             <td>
-                    @Html.DisplayFor(modelItem => item.Venue.VenueName)
+                @Html.DisplayFor(modelItem => item.Venue.VenueName)
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                {
+                    <img src="@item.ImageUrl" alt="@item.EventName" style="width:120px; height:75px; object-fit:cover; border-radius:6px;" />
+                }
             </td>
             <td>
                 <a asp-action="Edit" asp-route-id="@item.EventId">Edit</a> |

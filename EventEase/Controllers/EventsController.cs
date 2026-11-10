@@ -29,7 +29,8 @@ public class EventsController : Controller
         }
 
         var @event = await _context.Events
-            .FirstOrDefaultAsync(m => m.EventId == id);
+    .Include(e => e.Venue)
+    .FirstOrDefaultAsync(m => m.EventId == id);
         if (@event == null)
         {
             return NotFound();
@@ -50,7 +51,7 @@ public class EventsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("EventId,EventName,EventDate,Description,VenueId")] Event @event)
+    public async Task<IActionResult> Create([Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId")] Event @event)
     {
         if (ModelState.IsValid)
         {
@@ -75,6 +76,7 @@ public class EventsController : Controller
         {
             return NotFound();
         }
+        ViewData["VenueId"] = new SelectList(_context.Venues, "VenueId", "VenueName", @event.VenueId);
         return View(@event);
     }
 
@@ -83,7 +85,7 @@ public class EventsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("EventId,EventName,EventDate,Description,VenueId,Venue")] Event @event)
+    public async Task<IActionResult> Edit(int? id, [Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId")] Event @event)
     {
         if (id != @event.EventId)
         {
@@ -110,6 +112,7 @@ public class EventsController : Controller
             }
             return RedirectToAction(nameof(Index));
         }
+        ViewData["VenueId"] = new SelectList(_context.Venues, "VenueId", "VenueName", @event.VenueId);
         return View(@event);
     }
 
@@ -122,7 +125,8 @@ public class EventsController : Controller
         }
 
         var @event = await _context.Events
-            .FirstOrDefaultAsync(m => m.EventId == id);
+    .Include(e => e.Venue)
+    .FirstOrDefaultAsync(m => m.EventId == id);
         if (@event == null)
         {
             return NotFound();
