@@ -4,14 +4,17 @@ using Microsoft.EntityFrameworkCore;
 using EventEase.Models;
 using EventEase.Data;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using EventEase.Services;
 
 public class EventsController : Controller
 {
     private readonly ApplicationDbContext _context;
+    private readonly BlobService _blobService;
 
-    public EventsController(ApplicationDbContext context)
+    public EventsController(ApplicationDbContext context, BlobService blobService)
     {
         _context = context;
+        _blobService = blobService;
     }
 
     // GET: EVENTS
@@ -51,10 +54,15 @@ public class EventsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId")] Event @event)
+    public async Task<IActionResult> Create([Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId")] Event @event, IFormFile? imageFile)
     {
         if (ModelState.IsValid)
         {
+            if (imageFile != null && imageFile.Length > 0)
+            {
+                @event.ImageUrl = await _blobService.UploadImageAsync(imageFile);
+            }
+
             _context.Add(@event);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
@@ -85,7 +93,7 @@ public class EventsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId")] Event @event)
+    public async Task<IActionResult> Edit(int? id, [Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId")] Event @event, IFormFile? imageFile)
     {
         if (id != @event.EventId)
         {
@@ -96,6 +104,11 @@ public class EventsController : Controller
         {
             try
             {
+                if (imageFile != null && imageFile.Length > 0)
+                {
+                    @event.ImageUrl = await _blobService.UploadImageAsync(imageFile);
+                }
+
                 _context.Update(@event);
                 await _context.SaveChangesAsync();
             }
@@ -138,15 +151,29 @@ public class EventsController : Controller
     // POST: EVENTS/Delete/5
     [HttpPost, ActionName("Delete")]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> DeleteConfirmed(int? id)
+    public async Task<IActionResult> DeleteConfirmed(int id)
     {
+        bool hasBookings = await _context.Bookings.AnyAsync(b => b.EventId == id);
+        if (hasBookings)
+        {
+            TempData["Error"] = "This event cannot be deleted because it has existing bookings. Remove those bookings first.";
+            return RedirectToAction(nameof(Index));
+        }
+
         var @event = await _context.Events.FindAsync(id);
         if (@event != null)
         {
-            _context.Events.Remove(@event);
+            try
+            {
+                _context.Events.Remove(@event);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Event deleted successfully.";
+            }
+            catch (DbUpdateException)
+            {
+                TempData["Error"] = "The event could not be deleted because other records depend on it.";
+            }
         }
-
-        await _context.SaveChangesAsync();
         return RedirectToAction(nameof(Index));
     }
 

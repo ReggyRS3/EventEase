@@ -13,14 +13,27 @@ public class BookingsController : Controller
     {
         _context = context;
     }
-
     // GET: BOOKINGS
-    public async Task<IActionResult> Index()    
+    public async Task<IActionResult> Index(string? search)
     {
-        return View(await _context.Bookings
-    .Include(b => b.Event)
-    .Include(b => b.Venue)
-    .ToListAsync());
+        var bookings = _context.BookingDetails.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            search = search.Trim();
+
+            if (int.TryParse(search, out int bookingId))
+            {
+                bookings = bookings.Where(b => b.BookingId == bookingId || b.EventName.Contains(search));
+            }
+            else
+            {
+                bookings = bookings.Where(b => b.EventName.Contains(search));
+            }
+        }
+
+        ViewData["Search"] = search;
+        return View(await bookings.OrderBy(b => b.BookingDate).ToListAsync());
     }
 
     // GET: BOOKINGS/Details/5
@@ -56,10 +69,21 @@ public class BookingsController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create([Bind("BookingId,BookingDate,VenueId,EventId")] Booking booking)
     {
+        bool doubleBooked = await _context.Bookings.AnyAsync(b =>
+    b.VenueId == booking.VenueId &&
+    b.BookingDate == booking.BookingDate &&
+    b.BookingId != booking.BookingId);
+
+        if (doubleBooked)
+        {
+            ModelState.AddModelError("", "This venue is already booked for that date and time. Please choose another time or venue.");
+            TempData["Error"] = "Booking not saved: the venue is already booked at that date and time.";
+        }
         if (ModelState.IsValid)
         {
             _context.Add(booking);
             await _context.SaveChangesAsync();
+            TempData["Success"] = "Booking created successfully.";
             return RedirectToAction(nameof(Index));
         }
         ViewData["EventId"] = new SelectList(_context.Events, "EventId", "EventName", booking.EventId);
@@ -103,6 +127,7 @@ public class BookingsController : Controller
             {
                 _context.Update(booking);
                 await _context.SaveChangesAsync();
+                TempData["Success"] = "Booking updated successfully.";
             }
             catch (DbUpdateConcurrencyException)
             {

@@ -1,25 +1,25 @@
 @model EventEase.Models.Event
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Event";
 }
 
 <h1>Edit</h1>
-
 <h4>Event</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="EventId" />
+            <input type="hidden" asp-for="ImageUrl" />
             <div class="form-group">
-                <label asp-for="EventName" class="control-label"></label>
+                <label asp-for="EventName" class="control-label">Event Name</label>
                 <input asp-for="EventName" class="form-control" />
                 <span asp-validation-for="EventName" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="EventDate" class="control-label"></label>
+                <label asp-for="EventDate" class="control-label">Event Date</label>
                 <input asp-for="EventDate" class="form-control" />
                 <span asp-validation-for="EventDate" class="text-danger"></span>
             </div>
@@ -29,19 +29,28 @@
                 <span asp-validation-for="Description" class="text-danger"></span>
             </div>
             <div class="form-group">
-    <label asp-for="ImageUrl" class="control-label">Image URL</label>
-    <input asp-for="ImageUrl" class="form-control" placeholder="https://..." />
-    <span asp-validation-for="ImageUrl" class="text-danger"></span>
-</div>
-            <div class="form-group">
                 <label asp-for="VenueId" class="control-label">Venue</label>
                 <select asp-for="VenueId" class="form-control" asp-items="ViewBag.VenueId">
                     <option value="">-- Select a venue --</option>
                 </select>
                 <span asp-validation-for="VenueId" class="text-danger"></span>
             </div>
-            
             <div class="form-group">
+                <label class="control-label">Current Image</label><br />
+                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                {
+                    <img src="@Model.ImageUrl" alt="@Model.EventName" style="width:160px; height:100px; object-fit:cover; border-radius:6px;" />
+                }
+                else
+                {
+                    <span class="text-muted">No image yet</span>
+                }
+            </div>
+            <div class="form-group">
+                <label class="control-label">Replace Image (optional)</label>
+                <input type="file" name="imageFile" class="form-control" accept="image/*" />
+            </div>
+            <div class="form-group mt-3">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
         </form>
@@ -53,5 +62,7 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

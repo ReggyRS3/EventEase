@@ -1,49 +1,70 @@
-@model IEnumerable<EventEase.Models.Booking>
+@model IEnumerable<EventEase.Models.BookingDetails>
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Bookings";
 }
 
-<h1>Index</h1>
+<h1>Bookings</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="Create" class="btn btn-primary">Create New Booking</a>
 </p>
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.BookingDate)
-            </th>
-          
-            <th>
-                @Html.DisplayNameFor(model => model.Event)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Venue)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(model => item.BookingDate)
-            </td>
-          
-            <td>
-                    @Html.DisplayFor(modelItem => item.Event.EventName)
-            </td>
-            <td>
-                    @Html.DisplayFor(modelItem => item.Venue.VenueName)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.BookingId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.BookingId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.BookingId">Delete</a>
-            </td>
-        </tr>
+
+<form asp-action="Index" method="get" class="row g-2 mb-3">
+    <div class="col-md-6">
+        <input type="text" name="search" value="@ViewData["Search"]" class="form-control"
+               placeholder="Search by Booking ID or Event Name" />
+    </div>
+    <div class="col-auto">
+        <button type="submit" class="btn btn-outline-primary">Search</button>
+        <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
+    </div>
+</form>
+
+@if (!Model.Any())
+{
+    <div class="alert alert-info">No bookings found.</div>
 }
-    </tbody>
-</table>
+else
+{
+    <table class="table table-striped align-middle">
+        <thead>
+            <tr>
+                <th>Booking ID</th>
+                <th>Booking Date</th>
+                <th>Event</th>
+                <th>Event Date</th>
+                <th>Venue</th>
+                <th>Location</th>
+                <th>Capacity</th>
+                <th>Image</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.BookingId</td>
+                    <td>@item.BookingDate.ToString("yyyy/MM/dd HH:mm")</td>
+                    <td>@item.EventName</td>
+                    <td>@item.EventDate.ToString("yyyy/MM/dd HH:mm")</td>
+                    <td>@item.VenueName</td>
+                    <td>@item.Location</td>
+                    <td>@item.Capacity</td>
+                    <td>
+                        @if (!string.IsNullOrEmpty(item.VenueImageUrl))
+                        {
+                            <img src="@item.VenueImageUrl" alt="@item.VenueName" style="width:100px; height:62px; object-fit:cover; border-radius:6px;" />
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.BookingId">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.BookingId">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.BookingId">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
