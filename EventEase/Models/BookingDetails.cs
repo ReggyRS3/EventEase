@@ -16,5 +16,8 @@
         public string Location { get; set; } = string.Empty;
         public int Capacity { get; set; }
         public string? VenueImageUrl { get; set; }
+        public int? EventTypeId { get; set; }
+        public string? EventTypeName { get; set; }
+        public bool VenueIsAvailable { get; set; }
     }
 }

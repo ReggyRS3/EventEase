@@ -46,6 +46,7 @@ public class EventsController : Controller
     public IActionResult Create()
     {
         ViewData["VenueId"] = new SelectList(_context.Venues, "VenueId", "VenueName");
+        ViewData["EventTypeId"] = new SelectList(_context.EventTypes, "EventTypeId", "Name");
         return View();
     }
 
@@ -54,7 +55,7 @@ public class EventsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create([Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId")] Event @event, IFormFile? imageFile)
+    public async Task<IActionResult> Create([Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId,EventTypeId")] Event @event, IFormFile? imageFile)
     {
         if (ModelState.IsValid)
         {
@@ -68,6 +69,7 @@ public class EventsController : Controller
             return RedirectToAction(nameof(Index));
         }
         ViewData["VenueId"] = new SelectList(_context.Venues, "VenueId", "VenueName", @event.VenueId);
+        ViewData["EventTypeId"] = new SelectList(_context.EventTypes, "EventTypeId", "Name", @event.EventTypeId);
         return View(@event);
     }
 
@@ -85,6 +87,7 @@ public class EventsController : Controller
             return NotFound();
         }
         ViewData["VenueId"] = new SelectList(_context.Venues, "VenueId", "VenueName", @event.VenueId);
+        ViewData["EventTypeId"] = new SelectList(_context.EventTypes, "EventTypeId", "Name", @event.EventTypeId);
         return View(@event);
     }
 
@@ -93,7 +96,7 @@ public class EventsController : Controller
     // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(int? id, [Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId")] Event @event, IFormFile? imageFile)
+    public async Task<IActionResult> Edit(int? id, [Bind("EventId,EventName,EventDate,Description,ImageUrl,VenueId,EventTypeId")] Event @event, IFormFile? imageFile)
     {
         if (id != @event.EventId)
         {
@@ -126,6 +129,7 @@ public class EventsController : Controller
             return RedirectToAction(nameof(Index));
         }
         ViewData["VenueId"] = new SelectList(_context.Venues, "VenueId", "VenueName", @event.VenueId);
+        ViewData["EventTypeId"] = new SelectList(_context.EventTypes, "EventTypeId", "Name", @event.EventTypeId);
         return View(@event);
     }
 

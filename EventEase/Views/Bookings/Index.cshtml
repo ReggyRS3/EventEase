@@ -2,6 +2,7 @@
 
 @{
     ViewData["Title"] = "Bookings";
+    var venueAvailable = ViewData["VenueAvailable"] as bool?;
 }
 
 <h1>Bookings</h1>
@@ -10,13 +11,36 @@
     <a asp-action="Create" class="btn btn-primary">Create New Booking</a>
 </p>
 
-<form asp-action="Index" method="get" class="row g-2 mb-3">
-    <div class="col-md-6">
+<form asp-action="Index" method="get" class="row g-2 mb-3 align-items-end">
+    <div class="col-md-3">
+        <label class="form-label">Search</label>
         <input type="text" name="search" value="@ViewData["Search"]" class="form-control"
-               placeholder="Search by Booking ID or Event Name" />
+               placeholder="Booking ID or Event Name" />
     </div>
-    <div class="col-auto">
-        <button type="submit" class="btn btn-outline-primary">Search</button>
+    <div class="col-md-2">
+        <label class="form-label">Event Type</label>
+        <select name="eventTypeId" class="form-select" asp-items="ViewBag.EventTypeId">
+            <option value="">All types</option>
+        </select>
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">From</label>
+        <input type="date" name="startDate" value="@ViewData["StartDate"]" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">To</label>
+        <input type="date" name="endDate" value="@ViewData["EndDate"]" class="form-control" />
+    </div>
+    <div class="col-md-2">
+        <label class="form-label">Venue Availability</label>
+        <select name="venueAvailable" class="form-select">
+            <option value="">All venues</option>
+            <option value="true" selected="@(venueAvailable == true)">Available</option>
+            <option value="false" selected="@(venueAvailable == false)">Unavailable</option>
+        </select>
+    </div>
+    <div class="col-md-1 d-flex gap-1">
+        <button type="submit" class="btn btn-outline-primary">Filter</button>
         <a asp-action="Index" class="btn btn-outline-secondary">Clear</a>
     </div>
 </form>
@@ -33,10 +57,11 @@ else
                 <th>Booking ID</th>
                 <th>Booking Date</th>
                 <th>Event</th>
-                <th>Event Date</th>
+                <th>Event Type</th>
                 <th>Venue</th>
                 <th>Location</th>
                 <th>Capacity</th>
+                <th>Available</th>
                 <th>Image</th>
                 <th></th>
             </tr>
@@ -48,10 +73,20 @@ else
                     <td>@item.BookingId</td>
                     <td>@item.BookingDate.ToString("yyyy/MM/dd HH:mm")</td>
                     <td>@item.EventName</td>
-                    <td>@item.EventDate.ToString("yyyy/MM/dd HH:mm")</td>
+                    <td>@(item.EventTypeName ?? "Not set")</td>
                     <td>@item.VenueName</td>
                     <td>@item.Location</td>
                     <td>@item.Capacity</td>
+                    <td>
+                        @if (item.VenueIsAvailable)
+                        {
+                            <span class="badge bg-success">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </td>
                     <td>
                         @if (!string.IsNullOrEmpty(item.VenueImageUrl))
                         {

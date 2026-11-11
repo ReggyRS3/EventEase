@@ -14,10 +14,11 @@ public class BookingsController : Controller
         _context = context;
     }
     // GET: BOOKINGS
-    public async Task<IActionResult> Index(string? search)
+    public async Task<IActionResult> Index(string? search, int? eventTypeId, DateTime? startDate, DateTime? endDate, bool? venueAvailable)
     {
         var bookings = _context.BookingDetails.AsQueryable();
 
+        // Search by Booking ID or Event Name (Part 2)
         if (!string.IsNullOrWhiteSpace(search))
         {
             search = search.Trim();
@@ -32,7 +33,36 @@ public class BookingsController : Controller
             }
         }
 
+        // Filter by event type (Part 3)
+        if (eventTypeId.HasValue)
+        {
+            bookings = bookings.Where(b => b.EventTypeId == eventTypeId.Value);
+        }
+
+        // Filter by date range (Part 3)
+        if (startDate.HasValue)
+        {
+            var from = startDate.Value.Date;
+            bookings = bookings.Where(b => b.BookingDate >= from);
+        }
+        if (endDate.HasValue)
+        {
+            var to = endDate.Value.Date.AddDays(1);
+            bookings = bookings.Where(b => b.BookingDate < to);
+        }
+
+        // Filter by venue availability (Part 3)
+        if (venueAvailable.HasValue)
+        {
+            bookings = bookings.Where(b => b.VenueIsAvailable == venueAvailable.Value);
+        }
+
         ViewData["Search"] = search;
+        ViewData["EventTypeId"] = new SelectList(_context.EventTypes, "EventTypeId", "Name", eventTypeId);
+        ViewData["StartDate"] = startDate?.ToString("yyyy-MM-dd");
+        ViewData["EndDate"] = endDate?.ToString("yyyy-MM-dd");
+        ViewData["VenueAvailable"] = venueAvailable;
+
         return View(await bookings.OrderBy(b => b.BookingDate).ToListAsync());
     }
 

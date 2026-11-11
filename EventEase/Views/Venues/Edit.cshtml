@@ -28,6 +28,10 @@
                 <input asp-for="Capacity" class="form-control" />
                 <span asp-validation-for="Capacity" class="text-danger"></span>
             </div>
+            <div class="form-check mt-2">
+                <input asp-for="IsAvailable" class="form-check-input" />
+                <label asp-for="IsAvailable" class="form-check-label">Venue is available</label>
+            </div>
             <div class="form-group">
                 <label class="control-label">Current Image</label><br />
                 @if (!string.IsNullOrEmpty(Model.ImageUrl))

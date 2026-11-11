@@ -15,5 +15,6 @@ namespace EventEase.Models
         public int Capacity { get; set; }
 
         public string? ImageUrl { get; set; }
+        public bool IsAvailable { get; set; } = true;
     }
 }
